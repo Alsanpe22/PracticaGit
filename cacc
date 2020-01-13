@@ -1,0 +1,102 @@
+#include <iostream>
+#include <vector>
+#include <functional>
+​
+using namespace std;
+​
+std::function<float(float,float)> sumar = [](float a,float b) {
+    return (a+b);
+};
+​
+std::function<float(float,float)> restar = [](float a,float b) {
+    return (a-b);
+};
+​
+std::function<float(float,float)> multiplicar = [](float a,float b) {
+    return (a*b);
+};
+std::function<float(float,float)> dividir = [](float a,float b) {
+    return (a/b);
+};
+​
+void operacion(vector<float> &v, vector<char> &o,int indice, std::function<float(float,float)> const &fp)
+{
+    float temp=0;
+​
+    temp=fp(v.at(indice),v.at(indice+1));
+    v.erase(v.begin()+indice,v.begin()+indice+2);
+    v.insert(v.begin()+indice,temp);
+    o.erase(o.begin()+indice);
+}
+​
+​
+int main()
+{
+   int n=0,num=0,vueltas=4, ind=0;
+   float temp=0;
+   char oper;
+   std::vector<float> vec; //Numeros que vamos a operar
+   std::vector<char> operaciones; //Operaciones que vamos a realizar sobre los números
+   cout << "Cuantos?:" << endl;
+   cin>>n;//Introducimos cuantos numeros vamos a operar
+   for (int i=1;i<=n;i++) {
+       std::cout<<"N_"<<i<<":";
+       std::cin>>num;
+       vec.push_back(num);
+   }
+​
+   for(int i=1;i<n;i++)
+   {
+          std::cout<<"Operacion_"<<i<<":";
+          std::cin>>oper;
+          operaciones.push_back(oper);
+   }
+   while(vueltas>0)
+   {//Usamos la variable vueltas para gestionar la prioridad de las operaciones con un switch-case
+          ind=operaciones.size()-1; //Indice para movernos por el vector de operaciones a realizar
+          while(ind>=0)
+          {//Mientras queden operaciones que resolver seguimos
+              switch(vueltas)
+              {
+                  case 4://buscamos multiplicaciones
+                      if(operaciones.at(ind)=='*')
+                      {
+                          operacion(vec,operaciones,ind,multiplicar);
+                      }
+                      break;
+                  case 3://buscamos divisiones
+                      if(operaciones.at(ind)=='/')
+                      {
+                          operacion(vec,operaciones,ind,dividir);
+                      }
+                      break;
+                   case 2://buscamos sumas
+                      if(operaciones.at(ind)=='+')
+                      {
+                          operacion(vec,operaciones,ind,sumar);
+                       }
+                       break;
+                   case 1://buscamos restas
+                       if(operaciones.at(ind)=='-')
+                       {
+                            if(ind==0)
+                            {
+                               operacion(vec,operaciones,ind,restar);
+                            }
+                            else
+                            {
+                                operacion(vec,operaciones,ind,sumar);
+                            }
+                       }
+                       break;
+                   default:
+                       std::cout<<"Caso no contemplado"<<std::endl;
+                }
+                   ind--;//siguiente vuelta para buscar operaciones
+         }//while(ind>=0)
+      vueltas--;//Hemos terminado la vuelta buscando un operador
+    }//while(vueltas>0)
+​
+std::cout<<"El resultado es:"<<vec[0]<<std::endl;
+return 0;
+}//main
